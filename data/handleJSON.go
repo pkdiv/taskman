@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/fatih/color"
@@ -19,10 +20,31 @@ type Task struct {
 
 const dataFile = "data.json"
 
+var path string
+
+func init() {
+
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		fmt.Println("Cannot find config directory: " + err.Error())
+	}
+
+	path = filepath.Join(dir, dataFile)
+
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0644)
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	defer file.Close()
+}
+
 func readJSON() []Task {
 	var tasks []Task
 
-	file, err := os.ReadFile(dataFile)
+	file, err := os.ReadFile(path)
 
 	if err != nil {
 		fmt.Println(err)
@@ -41,7 +63,7 @@ func writeJSON(tasks []Task) {
 		fmt.Println(err)
 	}
 
-	writeErr := os.WriteFile(dataFile, data, 0644)
+	writeErr := os.WriteFile(path, data, 0644)
 
 	if writeErr != nil {
 		fmt.Println(writeErr)
@@ -133,9 +155,7 @@ func ToggleRecord(id int) {
 
 	tasks[id].Completed = !tasks[id].Completed
 
-	records := tasks
-
-	writeJSON(records)
+	writeJSON(tasks)
 }
 
 func UpdateRecord(id int, taskTitle string) {

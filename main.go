@@ -10,15 +10,6 @@ import (
 
 func main() {
 
-	file, err := os.OpenFile("data.json", os.O_RDWR|os.O_CREATE, 0644)
-
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	defer file.Close()
-
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: taskman command")
 		os.Exit(1)
@@ -82,7 +73,8 @@ func main() {
 			os.Exit(1)
 		}
 		data.UpdateRecord(id, os.Args[3])
-
+	default:
+		fmt.Println("Command:", command, "Not Present")
 	}
 
 }
